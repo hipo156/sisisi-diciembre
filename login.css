@@ -13,7 +13,7 @@ body {
   padding: 0;
   box-sizing: border-box;
   height: 100vh;
-  background-image: url('./assets/img\ fondo.png'); 
+  background-image: url('./assets/img\ fondo.png');
   background-size: cover;
   background-position: center;
 }
@@ -37,6 +37,7 @@ body {
   justify-content: center;
   align-items: center;
   padding: 20px;
+  position: relative; /* Necesario para posicionar el botón */
 }
 
 .app-container-title {
@@ -89,11 +90,52 @@ button {
   border-radius: 5px;
   padding: 10px 20px;
   cursor: pointer;
-  margin: 20px 0; /* Añadido margen vertical */
+  margin: 20px 0;
   transition: background-color 0.3s;
-  align-self: center; /* Centra el botón dentro de su contenedor flexbox */
+  align-self: center;
 }
 
 button:hover {
   background-color: var(--boton-hover);
 }
+
+/* Botón Modo Oscuro */
+.theme-toggle {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--boton);
+  color: var(--texto);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.theme-toggle:hover {
+  background-color: var(--boton-hover);
+}
+
+.dark-mode {
+  background-color: #121212; 
+  color: #ffffff; 
+}
+
+.dark-mode * {
+  background-color: inherit; 
+  color: inherit; 
+}
+
+.dark-mode button {
+  background-color: #333333; 
+  color: #ffffff; 
+  border: 1px solid #555555; 
+}
+
+.dark-mode input {
+  background-color: #222222;
+  color: #ffffff;
+  border: 1px solid #555555;
+}
+
