@@ -16,3 +16,6 @@ Modo oscuro y modo claro
 La aplicación incluye la posibilidad de alternar entre modo oscuro y modo claro, una característica muy solicitada para mejorar la experiencia del usuario.
 El modo oscuro es ideal para entornos con poca luz y ayuda a reducir la fatiga visual, mientras que el modo claro puede ser más apropiado en condiciones de alta luminosidad.
 Los usuarios pueden cambiar de modo fácilmente según sus preferencias desde la interfaz de la aplicación.
+
+ahora LA FUNCION DE DADO  que suma los resultados    y  te tira resultados aleatoriamente. 
+las modificaciones fueron que se cambio la paginade 404 a la pagina  de dado  
