@@ -18,13 +18,14 @@ function toggleTheme() {
 
 function addThemeToggleEvent() {
   const themeToggle = document.getElementById("theme-toggle");
-  themeToggle.onclick = toggleTheme;
+  if (themeToggle) {
+    themeToggle.onclick = toggleTheme;
 
-  // Mantiene el estado del modo oscuro al renderizar nuevas pantallas
-  if (body.classList.contains("dark-mode")) {
-    themeToggle.textContent = "Modo Claro";
-  } else {
-    themeToggle.textContent = "Modo Oscuro";
+    if (body.classList.contains("dark-mode")) {
+      themeToggle.textContent = "Modo Claro";
+    } else {
+      themeToggle.textContent = "Modo Oscuro";
+    }
   }
 }
 
@@ -37,65 +38,79 @@ function loadTheme() {
 
 loadTheme();
 
-// Pantalla principal o Login
-const app = document.getElementById("app");
-const pantallaLogin = `<h1 class="app-container-title">¡Bienvenido!</h1>
-            <form class="form" id="login-form">
-              <input
-                name="username"
-                type="text"
-                placeholder=" Usuario"
-                required
-              />
-              <input
-                name="password"
-                type="password"
-                placeholder=" Contraseña"
-                required
-              />
-              <input type="submit" value="Login" />
-            </form>
-            <div class="button-container">
-              <button onclick="renderRegistro()">Crear cuenta</button>
-            </div>`;
+// Pantalla del dado
+const imagenesDado = [
+  "../assets/1.png",
+  "../assets/2.png",
+  "../assets/3.png",
+  "../assets/4.png",
+  "../assets/5.png",
+  "../assets/6.png",
+];
 
-const pantalla404 = `<h1 class="app-container-title">404</h1>
-            <p>Página en construcción</p>
-            <div class="button-container">
-              <button onclick="renderLogin()">Volver al Login</button>
-            </div>`;
+const pantallaDados = `
+  <h1 class="app-container-title">Dados</h1>
+  <div style="text-align: center;">
+    <div>
+      <img src="${imagenesDado[0]}" alt="Dado" id="dado" style="width: 100px; height: 100px;" />
+    </div>
+    <p><strong>Bienvenido</strong> <span id="username"></span></p>
+    <p><strong>Total acumulado:</strong> <span id="total-acumulado">0</span></p>
+    <button id="lanzar" style="padding: 10px; font-size: 16px;">Lanzar</button>
+  </div>`;
 
+function renderDados() {
+  app.innerHTML = pantallaDados;
+  addThemeToggleEvent();
 
+  const username = localStorage.getItem("usuario") || "Invitado";
+  document.getElementById("username").textContent = username;
+
+  let totalAcumulado = 0;
+
+  document.getElementById("lanzar").onclick = () => {
+    const dado = document.getElementById("dado");
+
+    // Genera número aleatorio entre 1 y 6
+    const resultado = Math.floor(Math.random() * 6) + 1;
+
+    // Cambia la imagen del dado
+    dado.src = imagenesDado[resultado - 1];
+
+    // Actualiza el total acumulado
+    totalAcumulado += resultado;
+    document.getElementById("total-acumulado").textContent = totalAcumulado;
+
+    actualizarHoraUltimaSesion(); // Actualiza la sesión
+  };
+}
+
+// Verifica sesión y redirige
 function verificarSesion() {
   const usuarioLogueado = localStorage.getItem("usuario");
   const horaUltimaSesion = localStorage.getItem("horaUltimaSesion");
 
   if (usuarioLogueado) {
-    // Calcula el tiempo de inactividad en minutos
     const tiempoInactividad = (new Date().getTime() - horaUltimaSesion) / 1000 / 60;
 
     if (tiempoInactividad < 10) {
-      app.innerHTML = pantalla404; 
-      addThemeToggleEvent(); 
-      iniciarContadorInactividad(); 
+      renderDados();
+      iniciarContadorInactividad();
     } else {
-      // Si han pasado más de 10 minutos, redirige al login
       localStorage.removeItem("usuario");
       localStorage.removeItem("horaUltimaSesion");
-      renderLogin(); // Muestra la pantalla de login
+      renderLogin();
     }
   } else {
-    renderLogin(); // Si no está logueado, muestra la pantalla de login
+    renderLogin();
   }
 }
 
 function renderLogin() {
   app.innerHTML = pantallaLogin;
-  addThemeToggleEvent(); // Vuelve a añadir el evento al botón
+  addThemeToggleEvent();
 
-  // Lógica de Login
   const loginForm = document.getElementById("login-form");
-
   loginForm.onsubmit = (evento) => {
     evento.preventDefault();
     const username = evento.target.username.value;
@@ -106,48 +121,32 @@ function renderLogin() {
     );
 
     if (usuarioEncontrado) {
-      // Usuario y contraseña correctos, redirige a la siguiente pantalla
-      localStorage.setItem("usuario", username); // Guarda el usuario en localStorage
-      localStorage.setItem("horaUltimaSesion", new Date().getTime()); // Guarda la hora de inicio de sesión
-      app.innerHTML = pantalla404;
-      addThemeToggleEvent(); 
-      iniciarContadorInactividad(); // Inicia el contador de inactividad para redirigir después de 10 minutos
+      localStorage.setItem("usuario", username);
+      localStorage.setItem("horaUltimaSesion", new Date().getTime());
+      renderDados();
+      iniciarContadorInactividad();
     } else {
       alert("Usuario o contraseña incorrectos");
     }
   };
 }
 
-// Pantalla Registro
-const pantallaRegistro = `<h1 class="app-container-title">Registro</h1>
-            <form class="form" id="register-form">
-              <input
-                name="username"
-                type="text"
-                placeholder=" Usuario nuevo"
-                required
-              />
-              <input
-                name="password1"
-                type="password"
-                placeholder=" Contraseña"
-                required
-              />
-              <input
-                name="password2"
-                type="password"
-                placeholder=" Repetir Contraseña"
-                required
-              />
-              <input type="submit" value="Crear" />
-            </form>
-            <div class="button-container">
-              <button onclick="renderLogin()">Volver al Login</button>
-            </div>`;
+function iniciarContadorInactividad() {
+  setTimeout(() => {
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("horaUltimaSesion");
+    renderLogin();
+  }, 10 * 60 * 1000);
+}
 
+function actualizarHoraUltimaSesion() {
+  localStorage.setItem("horaUltimaSesion", new Date().getTime());
+}
+
+// Registro
 function renderRegistro() {
   app.innerHTML = pantallaRegistro;
-  addThemeToggleEvent(); 
+  addThemeToggleEvent();
 
   const registerForm = document.getElementById("register-form");
   registerForm.onsubmit = (evento) => {
@@ -171,41 +170,20 @@ function renderRegistro() {
     }
 
     const nuevoID = bdUsuarios[bdUsuarios.length - 1]?.id + 1 || 1;
-    const nuevoUsuario = {
-      username: username,
-      password: password1,
-      id: nuevoID,
-    };
-
+    const nuevoUsuario = { username, password: password1, id: nuevoID };
     bdUsuarios.push(nuevoUsuario);
     localStorage.setItem("usuarios", JSON.stringify(bdUsuarios));
+    localStorage.setItem("usuario", username);
+    localStorage.setItem("horaUltimaSesion", new Date().getTime());
 
-    localStorage.setItem("usuario", username); // Guarda el usuario registrado
-    localStorage.setItem("horaUltimaSesion", new Date().getTime()); // Guarda la hora de inicio de sesión
-    app.innerHTML = pantalla404;
-    addThemeToggleEvent(); 
+    renderDados();
     iniciarContadorInactividad();
   };
 }
 
-// Llama a la función para verificar si el usuario está logueado al cargar la página
+// Inicia la verificación de sesión
 verificarSesion();
-
-// Función que actualiza la hora de la última sesión al realizar cualquier acción
-function actualizarHoraUltimaSesion() {
-  localStorage.setItem("horaUltimaSesion", new Date().getTime());
-}
-
-// Evento para actualizar la hora de la última sesión cada vez que el usuario interactúe con la página
-window.addEventListener('mousemove', actualizarHoraUltimaSesion);
-window.addEventListener('keydown', actualizarHoraUltimaSesion);
-
-
-function iniciarContadorInactividad() {
-  setTimeout(() => {
-    // Si pasan 10 minutos sin actividad, redirige al login
-    localStorage.removeItem("usuario");
-    localStorage.removeItem("horaUltimaSesion");
+);
     renderLogin(); 
   }, 10 * 60 * 1000); // 10 minutos en milisegundos
 }
