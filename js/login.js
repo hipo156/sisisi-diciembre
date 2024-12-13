@@ -183,8 +183,5 @@ function renderRegistro() {
 
 // Inicia la verificación de sesión
 verificarSesion();
-);
-    renderLogin(); 
-  }, 10 * 60 * 1000); // 10 minutos en milisegundos
-}
+
 
